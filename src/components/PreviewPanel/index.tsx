@@ -18,9 +18,10 @@ function SliceCard({ slice, index, isSelected, onClick }: SliceCardProps): React
       onClick={onClick}
       className={`
         relative group rounded-lg overflow-hidden border transition-all duration-150 text-left
-        ${isSelected
-          ? 'border-acid shadow-[0_0_16px_rgba(198,241,53,0.3)]'
-          : 'border-obsidian-700 hover:border-obsidian-500'
+        ${
+          isSelected
+            ? 'border-acid shadow-[0_0_16px_rgba(198,241,53,0.3)]'
+            : 'border-obsidian-700 hover:border-obsidian-500'
         }
       `}
     >
@@ -45,7 +46,13 @@ function SliceCard({ slice, index, isSelected, onClick }: SliceCardProps): React
         {/* Selection check */}
         {isSelected && (
           <div className="absolute top-1 right-1 w-5 h-5 bg-acid rounded-full flex items-center justify-center">
-            <svg className="w-3 h-3 text-obsidian-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+            <svg
+              className="w-3 h-3 text-obsidian-950"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={3}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
@@ -61,9 +68,7 @@ function SliceCard({ slice, index, isSelected, onClick }: SliceCardProps): React
           <span className="text-xs text-obsidian-600">
             {formatDimensions(slice.width, slice.height)}
           </span>
-          <span className="text-xs text-obsidian-600">
-            {formatBytes(slice.sizeBytes)}
-          </span>
+          <span className="text-xs text-obsidian-600">{formatBytes(slice.sizeBytes)}</span>
         </div>
       </div>
     </button>
@@ -90,7 +95,9 @@ export function PreviewPanel(): React.ReactElement {
       <div className="flex-1 flex items-center justify-center text-center p-8">
         <div>
           <div className="text-4xl mb-3">⊞</div>
-          <p className="text-sm font-mono text-obsidian-500">No slices yet. Configure and process.</p>
+          <p className="text-sm font-mono text-obsidian-500">
+            No slices yet. Configure and process.
+          </p>
         </div>
       </div>
     )
@@ -108,9 +115,7 @@ export function PreviewPanel(): React.ReactElement {
             {slices.length}
           </span>
         </div>
-        <div className="text-xs font-mono text-obsidian-500">
-          {formatBytes(totalSize)} total
-        </div>
+        <div className="text-xs font-mono text-obsidian-500">{formatBytes(totalSize)} total</div>
       </div>
 
       {/* Slices grid */}

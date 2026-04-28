@@ -17,10 +17,7 @@ function safeCeil(value: number): number {
  * Computes pixel-precise grid cells with no bleeding.
  * Last row/col absorbs rounding remainder.
  */
-export function calculateGridCells(
-  image: ImageFile,
-  config: GridConfig
-): GridCell[] {
+export function calculateGridCells(image: ImageFile, config: GridConfig): GridCell[] {
   const { rows, cols, paddingPx } = config
   const { width: imgW, height: imgH } = image
 
@@ -43,12 +40,8 @@ export function calculateGridCells(
       const y = row * (baseH + paddingPx)
 
       // Last cell absorbs any leftover pixels
-      const cellW = isLastCol
-        ? imgW - x - (isLastCol ? 0 : paddingPx)
-        : baseW
-      const cellH = isLastRow
-        ? imgH - y - (isLastRow ? 0 : paddingPx)
-        : baseH
+      const cellW = isLastCol ? imgW - x - (isLastCol ? 0 : paddingPx) : baseW
+      const cellH = isLastRow ? imgH - y - (isLastRow ? 0 : paddingPx) : baseH
 
       cells.push({
         row,

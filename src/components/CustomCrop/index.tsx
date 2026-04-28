@@ -179,7 +179,10 @@ export function CustomCropEditor(): React.ReactElement | null {
   const dragRef = useRef<DragState | null>(null)
 
   const [currentDraw, setCurrentDraw] = useState<{
-    x: number; y: number; w: number; h: number
+    x: number
+    y: number
+    w: number
+    h: number
   } | null>(null)
   const [isDrawing, setIsDrawing] = useState(false)
 
@@ -223,7 +226,12 @@ export function CustomCropEditor(): React.ReactElement | null {
     const focusRect = isDrawing
       ? currentDraw
       : selectedRegion
-        ? { x: selectedRegion.x, y: selectedRegion.y, w: selectedRegion.width, h: selectedRegion.height }
+        ? {
+            x: selectedRegion.x,
+            y: selectedRegion.y,
+            w: selectedRegion.width,
+            h: selectedRegion.height,
+          }
         : null
 
     drawRegions(ctx, regions, selectedRegionId, w, h, focusRect)
@@ -261,7 +269,9 @@ export function CustomCropEditor(): React.ReactElement | null {
     return () => ro.disconnect()
   }, [redraw])
 
-  useEffect(() => { redraw() }, [redraw])
+  useEffect(() => {
+    redraw()
+  }, [redraw])
 
   // ── Keyboard: Delete / Backspace ──────────────────────────────────────────
 
@@ -301,9 +311,22 @@ export function CustomCropEditor(): React.ReactElement | null {
       if (selectedRegionId) {
         const sel = regions.find((r) => r.id === selectedRegionId)
         if (sel && canvasRef.current) {
-          const corner = getCornerHit(sel, nx, ny, canvasRef.current.width, canvasRef.current.height)
+          const corner = getCornerHit(
+            sel,
+            nx,
+            ny,
+            canvasRef.current.width,
+            canvasRef.current.height
+          )
           if (corner) {
-            dragRef.current = { type: 'resizing', startX: nx, startY: ny, regionId: sel.id, corner, initialRegion: { ...sel } }
+            dragRef.current = {
+              type: 'resizing',
+              startX: nx,
+              startY: ny,
+              regionId: sel.id,
+              corner,
+              initialRegion: { ...sel },
+            }
             return
           }
         }
@@ -312,7 +335,13 @@ export function CustomCropEditor(): React.ReactElement | null {
       const hit = getRegionHit(regions, nx, ny)
       if (hit) {
         selectRegion(hit.id)
-        dragRef.current = { type: 'moving', startX: nx, startY: ny, regionId: hit.id, initialRegion: { ...hit } }
+        dragRef.current = {
+          type: 'moving',
+          startX: nx,
+          startY: ny,
+          regionId: hit.id,
+          initialRegion: { ...hit },
+        }
         return
       }
 
@@ -347,8 +376,10 @@ export function CustomCropEditor(): React.ReactElement | null {
       } else if (drag.type === 'resizing' && drag.regionId && drag.initialRegion && drag.corner) {
         const r = drag.initialRegion
         let { x, y, width, height } = r
-        if (drag.corner.includes('e')) width = clamp(r.x + r.width + (nx - drag.startX) - r.x, MIN_REGION_SIZE, 1 - x)
-        if (drag.corner.includes('s')) height = clamp(r.y + r.height + (ny - drag.startY) - r.y, MIN_REGION_SIZE, 1 - y)
+        if (drag.corner.includes('e'))
+          width = clamp(r.x + r.width + (nx - drag.startX) - r.x, MIN_REGION_SIZE, 1 - x)
+        if (drag.corner.includes('s'))
+          height = clamp(r.y + r.height + (ny - drag.startY) - r.y, MIN_REGION_SIZE, 1 - y)
         if (drag.corner.includes('w')) {
           const newX = clamp(r.x + (nx - drag.startX), 0, r.x + r.width - MIN_REGION_SIZE)
           width = r.x + r.width - newX
@@ -380,7 +411,10 @@ export function CustomCropEditor(): React.ReactElement | null {
           const newRegion: CustomRegion = {
             id: generateId(),
             label: `Region ${regions.length + 1}`,
-            x, y, width: w, height: h,
+            x,
+            y,
+            width: w,
+            height: h,
           }
           addRegion(newRegion)
           selectRegion(newRegion.id)
@@ -397,7 +431,9 @@ export function CustomCropEditor(): React.ReactElement | null {
   )
 
   const handleMouseLeave = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => { handleMouseUp(e) },
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      handleMouseUp(e)
+    },
     [handleMouseUp]
   )
 

@@ -54,7 +54,9 @@ export function ExportPanel(): React.ReactElement {
 
       {/* Export type */}
       <div className="space-y-2">
-        <div className="text-xs font-mono text-obsidian-500 uppercase tracking-wider">Output Type</div>
+        <div className="text-xs font-mono text-obsidian-500 uppercase tracking-wider">
+          Output Type
+        </div>
         <div className="space-y-1.5">
           {EXPORT_TYPES.map((et) => (
             <button
@@ -63,9 +65,10 @@ export function ExportPanel(): React.ReactElement {
               className={`
                 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border text-left
                 transition-all duration-150
-                ${exportOptions.type === et.value
-                  ? 'border-acid/50 bg-acid/5 text-obsidian-100'
-                  : 'border-obsidian-700 bg-obsidian-800/50 text-obsidian-400 hover:border-obsidian-600'
+                ${
+                  exportOptions.type === et.value
+                    ? 'border-acid/50 bg-acid/5 text-obsidian-100'
+                    : 'border-obsidian-700 bg-obsidian-800/50 text-obsidian-400 hover:border-obsidian-600'
                 }
               `}
             >
@@ -99,9 +102,10 @@ export function ExportPanel(): React.ReactElement {
               onClick={() => setExportOptions({ format: f.value })}
               className={`
                 py-2 px-1 rounded text-xs font-mono font-medium transition-all
-                ${exportOptions.format === f.value
-                  ? 'bg-acid/10 text-acid border border-acid/30'
-                  : 'bg-obsidian-800 text-obsidian-400 border border-obsidian-700 hover:border-obsidian-600'
+                ${
+                  exportOptions.format === f.value
+                    ? 'bg-acid/10 text-acid border border-acid/30'
+                    : 'bg-obsidian-800 text-obsidian-400 border border-obsidian-700 hover:border-obsidian-600'
                 }
               `}
             >
@@ -115,8 +119,12 @@ export function ExportPanel(): React.ReactElement {
       {exportOptions.format !== 'png' && (
         <div className="space-y-2">
           <div className="flex justify-between">
-            <div className="text-xs font-mono text-obsidian-500 uppercase tracking-wider">Quality</div>
-            <div className="text-xs font-mono text-acid">{Math.round(exportOptions.quality * 100)}%</div>
+            <div className="text-xs font-mono text-obsidian-500 uppercase tracking-wider">
+              Quality
+            </div>
+            <div className="text-xs font-mono text-acid">
+              {Math.round(exportOptions.quality * 100)}%
+            </div>
           </div>
           <input
             type="range"
@@ -132,7 +140,9 @@ export function ExportPanel(): React.ReactElement {
 
       {/* Prefix */}
       <div className="space-y-2">
-        <div className="text-xs font-mono text-obsidian-500 uppercase tracking-wider">File Prefix</div>
+        <div className="text-xs font-mono text-obsidian-500 uppercase tracking-wider">
+          File Prefix
+        </div>
         <input
           type="text"
           value={exportOptions.prefix}
@@ -175,17 +185,32 @@ export function ExportPanel(): React.ReactElement {
         onClick={handleExport}
         icon={
           done ? (
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           ) : (
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
             </svg>
           )
         }
       >
-        {done ? 'Downloaded!' : exporting ? 'Exporting…' : `Export ${slices.length} Slice${slices.length !== 1 ? 's' : ''}`}
+        {done
+          ? 'Downloaded!'
+          : exporting
+            ? 'Exporting…'
+            : `Export ${slices.length} Slice${slices.length !== 1 ? 's' : ''}`}
       </Button>
 
       <div className="text-xs text-center text-obsidian-600 font-mono">

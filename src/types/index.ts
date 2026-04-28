@@ -33,10 +33,10 @@ export interface GridCell {
 export interface CustomRegion {
   id: string
   label: string
-  x: number       // 0–1 normalized
-  y: number       // 0–1 normalized
-  width: number   // 0–1 normalized
-  height: number  // 0–1 normalized
+  x: number // 0–1 normalized
+  y: number // 0–1 normalized
+  width: number // 0–1 normalized
+  height: number // 0–1 normalized
 }
 
 export type DrawState = 'idle' | 'drawing' | 'resizing' | 'moving'
@@ -68,7 +68,7 @@ export type ExportType = 'zip' | 'individual' | 'spritesheet'
 
 export interface ExportOptions {
   format: ExportFormat
-  quality: number      // 0–1, for jpeg/webp
+  quality: number // 0–1, for jpeg/webp
   type: ExportType
   prefix: string
 }

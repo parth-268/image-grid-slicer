@@ -43,9 +43,9 @@ function drawGridOverlay(
     const ch = cell.height * scaleY
 
     const lines = [
-      { x1: cx, y1: cy, x2: cx + cw, y2: cy },       // top
+      { x1: cx, y1: cy, x2: cx + cw, y2: cy }, // top
       { x1: cx, y1: cy + ch, x2: cx + cw, y2: cy + ch }, // bottom
-      { x1: cx, y1: cy, x2: cx, y2: cy + ch },         // left
+      { x1: cx, y1: cy, x2: cx, y2: cy + ch }, // left
       { x1: cx + cw, y1: cy, x2: cx + cw, y2: cy + ch }, // right
     ]
 
@@ -118,7 +118,11 @@ export function CanvasEditor(): React.ReactElement | null {
   const aspectRatio = imageFile.height / imageFile.width
 
   return (
-    <div className="relative w-full" ref={containerRef} style={{ paddingBottom: `${aspectRatio * 100}%` }}>
+    <div
+      className="relative w-full"
+      ref={containerRef}
+      style={{ paddingBottom: `${aspectRatio * 100}%` }}
+    >
       {/* Base image */}
       <img
         src={imageFile.url}

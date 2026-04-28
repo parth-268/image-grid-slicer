@@ -40,10 +40,7 @@ export async function exportAsZip(
 
 // ─── Individual File Export ───────────────────────────────────────────────────
 
-export async function exportIndividual(
-  slices: Slice[],
-  options: ExportOptions
-): Promise<void> {
+export async function exportIndividual(slices: Slice[], options: ExportOptions): Promise<void> {
   for (const slice of slices) {
     const fileName = `${sanitizeLabel(slice.label)}.${options.format}`
     saveAs(slice.blob, fileName)

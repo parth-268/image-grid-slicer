@@ -26,8 +26,13 @@ function useGlobalShortcuts() {
       const tag = document.activeElement?.tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA') return
 
-      if (e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo() }
-      else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') { e.preventDefault(); redo() }
+      if (e.key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        undo()
+      } else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') {
+        e.preventDefault()
+        redo()
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -51,9 +56,10 @@ function ModeToggle(): React.ReactElement {
           onClick={() => setMode(m)}
           className={`
             px-4 py-1.5 rounded text-xs font-mono font-medium transition-all capitalize
-            ${mode === m
-              ? 'bg-obsidian-700 text-obsidian-100 shadow'
-              : 'text-obsidian-500 hover:text-obsidian-300'
+            ${
+              mode === m
+                ? 'bg-obsidian-700 text-obsidian-100 shadow'
+                : 'text-obsidian-500 hover:text-obsidian-300'
             }
           `}
         >
@@ -112,8 +118,12 @@ function Header(): React.ReactElement {
         {imageFile && (
           <Button variant="ghost" size="sm" onClick={reset}>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
             </svg>
             New Image
           </Button>
@@ -125,7 +135,13 @@ function Header(): React.ReactElement {
 
 // ─── Custom Region List ───────────────────────────────────────────────────────
 
-function CustomRegionThumbnail({ imageUrl, region }: { imageUrl?: string; region: CustomRegion }): React.ReactElement {
+function CustomRegionThumbnail({
+  imageUrl,
+  region,
+}: {
+  imageUrl?: string
+  region: CustomRegion
+}): React.ReactElement {
   return (
     <div className="w-full h-full rounded-md overflow-hidden bg-obsidian-900 relative">
       {imageUrl && (
@@ -147,7 +163,8 @@ function CustomRegionThumbnail({ imageUrl, region }: { imageUrl?: string; region
 }
 
 function CustomRegionList(): React.ReactElement {
-  const { regions, selectedRegionId, selectRegion, removeRegion, updateRegion, imageFile } = useSlicerStore()
+  const { regions, selectedRegionId, selectRegion, removeRegion, updateRegion, imageFile } =
+    useSlicerStore()
 
   if (regions.length === 0) {
     return (
@@ -166,9 +183,10 @@ function CustomRegionList(): React.ReactElement {
           className={`
             grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-3 px-3 py-2 rounded-lg border cursor-pointer
             transition-all duration-150
-            ${selectedRegionId === r.id
-              ? 'border-acid/40 bg-acid/5'
-              : 'border-obsidian-700 hover:border-obsidian-600 bg-obsidian-800/50'
+            ${
+              selectedRegionId === r.id
+                ? 'border-acid/40 bg-acid/5'
+                : 'border-obsidian-700 hover:border-obsidian-600 bg-obsidian-800/50'
             }
           `}
         >
@@ -186,11 +204,19 @@ function CustomRegionList(): React.ReactElement {
           <button
             type="button"
             aria-label={`Delete ${r.label}`}
-            onClick={(e) => { e.stopPropagation(); removeRegion(r.id) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              removeRegion(r.id)
+            }}
             className="flex h-8 w-8 items-center justify-center rounded-md border border-transparent text-obsidian-600 transition-colors hover:border-red-500/25 hover:bg-red-500/10 hover:text-red-400"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -221,8 +247,18 @@ function HistoryControls(): React.ReactElement {
             border-obsidian-700 bg-obsidian-800/60 text-obsidian-300
             hover:enabled:border-obsidian-500 hover:enabled:text-obsidian-100"
         >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+          <svg
+            className="w-3.5 h-3.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+            />
           </svg>
           Undo
         </button>
@@ -235,8 +271,18 @@ function HistoryControls(): React.ReactElement {
             border-obsidian-700 bg-obsidian-800/60 text-obsidian-300
             hover:enabled:border-obsidian-500 hover:enabled:text-obsidian-100"
         >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
+          <svg
+            className="w-3.5 h-3.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6"
+            />
           </svg>
           Redo
         </button>
@@ -246,7 +292,9 @@ function HistoryControls(): React.ReactElement {
       </div>
 
       <div className="rounded-lg border border-obsidian-800 bg-obsidian-900/50 p-3 space-y-1.5">
-        <div className="text-xs font-mono text-obsidian-500 uppercase tracking-wider mb-2">Shortcuts</div>
+        <div className="text-xs font-mono text-obsidian-500 uppercase tracking-wider mb-2">
+          Shortcuts
+        </div>
         {[
           { key: 'Del / ⌫', label: 'Remove selected' },
           { key: 'Esc', label: 'Cancel drawing' },
@@ -311,8 +359,7 @@ function ConfigureLayout(): React.ReactElement {
               ? 'Slicing…'
               : mode === 'grid'
                 ? `Slice ${gridConfig.rows * gridConfig.cols} Cells`
-                : `Slice ${regions.length} Region${regions.length !== 1 ? 's' : ''}`
-            }
+                : `Slice ${regions.length} Region${regions.length !== 1 ? 's' : ''}`}
           </Button>
         </div>
       </aside>
@@ -338,7 +385,12 @@ function PreviewLayout(): React.ReactElement {
       <aside className="w-72 flex-shrink-0 border-r border-obsidian-800 bg-obsidian-950/60 overflow-y-auto p-5">
         <ExportPanel />
         <div className="mt-4 pt-4 border-t border-obsidian-800 space-y-2">
-          <Button variant="ghost" size="sm" className="w-full" onClick={() => setStage('configure')}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full"
+            onClick={() => setStage('configure')}
+          >
             ← Back to Configure
           </Button>
           <Button variant="secondary" size="sm" className="w-full" onClick={processSlices}>

@@ -8,15 +8,15 @@ export function GridControls(): React.ReactElement {
 
   const totalCells = gridConfig.rows * gridConfig.cols
 
-  const cellWidth =
-    imageFile
-      ? Math.floor((imageFile.width - gridConfig.paddingPx * (gridConfig.cols - 1)) / gridConfig.cols)
-      : 0
+  const cellWidth = imageFile
+    ? Math.floor((imageFile.width - gridConfig.paddingPx * (gridConfig.cols - 1)) / gridConfig.cols)
+    : 0
 
-  const cellHeight =
-    imageFile
-      ? Math.floor((imageFile.height - gridConfig.paddingPx * (gridConfig.rows - 1)) / gridConfig.rows)
-      : 0
+  const cellHeight = imageFile
+    ? Math.floor(
+        (imageFile.height - gridConfig.paddingPx * (gridConfig.rows - 1)) / gridConfig.rows
+      )
+    : 0
 
   return (
     <div className="space-y-6">
@@ -68,7 +68,9 @@ export function GridControls(): React.ReactElement {
             </div>
             <div>
               <div className="text-xs text-obsidian-500">Grid</div>
-              <div className="font-mono text-sm text-obsidian-200">{gridConfig.rows}×{gridConfig.cols}</div>
+              <div className="font-mono text-sm text-obsidian-200">
+                {gridConfig.rows}×{gridConfig.cols}
+              </div>
             </div>
             <div>
               <div className="text-xs text-obsidian-500">Ratio</div>

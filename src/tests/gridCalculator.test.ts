@@ -40,8 +40,12 @@ describe('calculateGridCells', () => {
       const cells = calculateGridCells(makeImage(300, 300), makeConfig(2, 3))
       const rowCols = cells.map((c) => [c.row, c.col])
       expect(rowCols).toEqual([
-        [0, 0], [0, 1], [0, 2],
-        [1, 0], [1, 1], [1, 2],
+        [0, 0],
+        [0, 1],
+        [0, 2],
+        [1, 0],
+        [1, 1],
+        [1, 2],
       ])
     })
   })

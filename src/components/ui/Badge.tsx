@@ -32,7 +32,9 @@ interface StatCardProps {
 export function StatCard({ label, value, sub }: StatCardProps): React.ReactElement {
   return (
     <div className="bg-obsidian-800/50 border border-obsidian-700/50 rounded p-3">
-      <div className="text-xs font-mono text-obsidian-500 uppercase tracking-widest mb-1">{label}</div>
+      <div className="text-xs font-mono text-obsidian-500 uppercase tracking-widest mb-1">
+        {label}
+      </div>
       <div className="text-lg font-mono font-bold text-obsidian-100 leading-none">{value}</div>
       {sub && <div className="text-xs text-obsidian-500 mt-0.5">{sub}</div>}
     </div>

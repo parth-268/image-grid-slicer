@@ -35,7 +35,7 @@ async function canvasToBlob(
   }
 
   return new Promise<Blob>((resolve, reject) => {
-    (canvas as HTMLCanvasElement).toBlob(
+    ;(canvas as HTMLCanvasElement).toBlob(
       (blob) => {
         if (blob) resolve(blob)
         else reject(new Error('Failed to convert canvas to blob'))
@@ -57,7 +57,9 @@ async function processCell(
   options: ExportOptions
 ): Promise<Blob> {
   const canvas = createOffscreenCanvas(sw, sh)
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+  const ctx = canvas.getContext('2d') as
+    | CanvasRenderingContext2D
+    | OffscreenCanvasRenderingContext2D
 
   if (!ctx) throw new Error('Failed to get canvas context')
 
@@ -80,14 +82,7 @@ export async function sliceImageGrid(
   for (let i = 0; i < cells.length; i++) {
     const cell = cells[i]
 
-    const blob = await processCell(
-      bitmap,
-      cell.x,
-      cell.y,
-      cell.width,
-      cell.height,
-      options
-    )
+    const blob = await processCell(bitmap, cell.x, cell.y, cell.width, cell.height, options)
 
     const url = URL.createObjectURL(blob)
     const label = `${options.prefix}_r${String(cell.row + 1).padStart(2, '0')}_c${String(cell.col + 1).padStart(2, '0')}`
@@ -157,15 +152,16 @@ export async function sliceImageCustom(
 
 // ─── Sprite Sheet Generator ───────────────────────────────────────────────────
 
-export async function generateSpriteSheet(
-  slices: Slice[],
-  options: ExportOptions
-): Promise<Blob> {
+export async function generateSpriteSheet(slices: Slice[], options: ExportOptions): Promise<Blob> {
   if (slices.length === 0) throw new Error('No slices to combine')
 
   // Load all slice images
   const bitmaps = await Promise.all(
-    slices.map((s) => fetch(s.url).then((r) => r.blob()).then((b) => createImageBitmap(b)))
+    slices.map((s) =>
+      fetch(s.url)
+        .then((r) => r.blob())
+        .then((b) => createImageBitmap(b))
+    )
   )
 
   // Calculate sprite sheet dimensions (horizontal strip)
@@ -173,7 +169,9 @@ export async function generateSpriteSheet(
   const maxHeight = Math.max(...slices.map((s) => s.height))
 
   const canvas = createOffscreenCanvas(totalWidth, maxHeight)
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+  const ctx = canvas.getContext('2d') as
+    | CanvasRenderingContext2D
+    | OffscreenCanvasRenderingContext2D
 
   if (!ctx) throw new Error('Failed to get canvas context')
 

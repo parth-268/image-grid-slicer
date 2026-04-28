@@ -28,7 +28,8 @@ export function Slider({
           {label}
         </label>
         <span className="text-sm font-mono text-acid font-semibold tabular-nums">
-          {value}{unit}
+          {value}
+          {unit}
         </span>
       </div>
       <div className="relative">
