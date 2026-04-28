@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { Toast } from '@/components/ui/Toast'
 import { useSlicer } from '@/hooks/useSlicer'
 import { formatBytes, formatDimensions } from '@/utils'
-import { ConvertPanel } from '@/components/ConvertPanel'
+import { ConvertLayout } from '@/components/ConvertPanel'
 import type { CustomRegion } from '@/types'
 
 // ─── Global Keyboard Shortcuts ────────────────────────────────────────────────
@@ -320,23 +320,6 @@ function HistoryControls(): React.ReactElement {
   )
 }
 
-// ─── Convert Mode Image Preview ───────────────────────────────────────────────
-
-function ConvertModePreview(): React.ReactElement | null {
-  const { imageFile } = useSlicerStore()
-  if (!imageFile) return null
-  return (
-    <div className="rounded-lg overflow-hidden border border-obsidian-800 bg-obsidian-900/50">
-      <img
-        src={imageFile.url}
-        alt="Source image"
-        className="w-full object-contain max-h-[70vh]"
-        draggable={false}
-      />
-    </div>
-  )
-}
-
 // ─── Configure Layout ─────────────────────────────────────────────────────────
 
 function ConfigureLayout(): React.ReactElement {
@@ -344,7 +327,8 @@ function ConfigureLayout(): React.ReactElement {
   const { processSlices } = useSlicer()
   useGlobalShortcuts()
   const isProcessing = processingStatus === 'processing'
-  const isConvertMode = mode === 'convert'
+
+  if (mode === 'convert') return <ConvertLayout />
 
   return (
     <div className="flex flex-1 overflow-hidden">
@@ -370,35 +354,29 @@ function ConfigureLayout(): React.ReactElement {
               )}
             </div>
           )}
-
-          {mode === 'convert' && <ConvertPanel />}
         </div>
 
-        {/* Slice button — hidden in convert mode (ConvertPanel handles its own actions) */}
-        {!isConvertMode && (
-          <div className="p-4 border-t border-obsidian-800">
-            <Button
-              variant="primary"
-              size="lg"
-              className="w-full"
-              loading={isProcessing}
-              onClick={processSlices}
-            >
-              {isProcessing
-                ? 'Slicing…'
-                : mode === 'grid'
-                  ? `Slice ${gridConfig.rows * gridConfig.cols} Cells`
-                  : `Slice ${regions.length} Region${regions.length !== 1 ? 's' : ''}`}
-            </Button>
-          </div>
-        )}
+        <div className="p-4 border-t border-obsidian-800">
+          <Button
+            variant="primary"
+            size="lg"
+            className="w-full"
+            loading={isProcessing}
+            onClick={processSlices}
+          >
+            {isProcessing
+              ? 'Slicing…'
+              : mode === 'grid'
+                ? `Slice ${gridConfig.rows * gridConfig.cols} Cells`
+                : `Slice ${regions.length} Region${regions.length !== 1 ? 's' : ''}`}
+          </Button>
+        </div>
       </aside>
 
       <main className="flex-1 overflow-auto p-6 bg-obsidian-950 relative">
         <div className="max-w-3xl mx-auto">
           {mode === 'grid' && <CanvasEditor />}
           {mode === 'custom' && <CustomCropEditor />}
-          {mode === 'convert' && <ConvertModePreview />}
         </div>
         <ProcessingBar />
       </main>

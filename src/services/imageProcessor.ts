@@ -150,7 +150,26 @@ export async function sliceImageCustom(
   return slices
 }
 
-// ─── Format Conversion ────────────────────────────────────────────────────────
+// ─── Format Conversion (raw File) ────────────────────────────────────────────
+
+export async function convertFile(
+  file: File,
+  targetFormat: ExportOptions['format'],
+  quality: number
+): Promise<Blob> {
+  const bitmap = await createImageBitmap(file, {
+    premultiplyAlpha: 'none',
+    colorSpaceConversion: 'none',
+  })
+  const canvas = createOffscreenCanvas(bitmap.width, bitmap.height)
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+  if (!ctx) throw new Error('Failed to get canvas context')
+  ctx.drawImage(bitmap, 0, 0)
+  bitmap.close()
+  return canvasToBlob(canvas, targetFormat, quality)
+}
+
+// ─── Format Conversion (ImageFile) ───────────────────────────────────────────
 
 export async function convertImageFormat(
   imageFile: ImageFile,
