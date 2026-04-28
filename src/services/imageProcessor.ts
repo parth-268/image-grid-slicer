@@ -35,7 +35,7 @@ async function canvasToBlob(
   }
 
   return new Promise<Blob>((resolve, reject) => {
-    (canvas as HTMLCanvasElement).toBlob(
+    ;(canvas as HTMLCanvasElement).toBlob(
       (blob) => {
         if (blob) resolve(blob)
         else reject(new Error('Failed to convert canvas to blob'))
@@ -162,7 +162,9 @@ export async function convertFile(
     colorSpaceConversion: 'none',
   })
   const canvas = createOffscreenCanvas(bitmap.width, bitmap.height)
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+  const ctx = canvas.getContext('2d') as
+    | CanvasRenderingContext2D
+    | OffscreenCanvasRenderingContext2D
   if (!ctx) throw new Error('Failed to get canvas context')
   ctx.drawImage(bitmap, 0, 0)
   bitmap.close()
@@ -178,7 +180,9 @@ export async function convertImageFormat(
 ): Promise<Blob> {
   const bitmap = await loadImageBitmap(imageFile)
   const canvas = createOffscreenCanvas(imageFile.width, imageFile.height)
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+  const ctx = canvas.getContext('2d') as
+    | CanvasRenderingContext2D
+    | OffscreenCanvasRenderingContext2D
   if (!ctx) throw new Error('Failed to get canvas context')
   ctx.drawImage(bitmap, 0, 0)
   bitmap.close()

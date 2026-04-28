@@ -81,6 +81,7 @@ type SlicerStore = ImageState &
   ExportState &
   UIState & {
     reset: () => void
+    enterBulkConvert: () => void
   }
 
 // ─── Default Values ──────────────────────────────────────────────────────────
@@ -222,6 +223,9 @@ export const useSlicerStore = create<SlicerStore>()(
       error: null,
       setError: (error) => set({ error }),
       clearError: () => set({ error: null }),
+
+      // ── Bulk Convert Entry ─────────────────────────────────────────────────
+      enterBulkConvert: () => set({ stage: 'configure', mode: 'convert' }),
 
       // ── Global Reset ───────────────────────────────────────────────────────
       reset: () =>

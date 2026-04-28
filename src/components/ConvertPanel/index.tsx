@@ -23,9 +23,9 @@ interface ConvertEntry {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const FORMATS: { value: ExportFormat; label: string; description: string; lossy: boolean }[] = [
-  { value: 'png',  label: 'PNG',  description: 'Lossless · transparency', lossy: false },
-  { value: 'jpeg', label: 'JPEG', description: 'Lossy · smallest size',   lossy: true  },
-  { value: 'webp', label: 'WebP', description: 'Lossy/lossless · modern', lossy: true  },
+  { value: 'png', label: 'PNG', description: 'Lossless · transparency', lossy: false },
+  { value: 'jpeg', label: 'JPEG', description: 'Lossy · smallest size', lossy: true },
+  { value: 'webp', label: 'WebP', description: 'Lossy/lossless · modern', lossy: true },
 ]
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -46,7 +46,7 @@ function fileToEntry(file: File): ConvertEntry {
 
 function mimeLabel(mime: string): string {
   if (mime === 'image/jpeg') return 'JPEG'
-  if (mime === 'image/png')  return 'PNG'
+  if (mime === 'image/png') return 'PNG'
   if (mime === 'image/webp') return 'WebP'
   return mime
 }
@@ -58,7 +58,14 @@ function StatusOverlay({ entry }: { entry: ConvertEntry }): React.ReactElement |
     return (
       <div className="absolute inset-0 bg-obsidian-950/70 flex items-center justify-center rounded-t-lg">
         <svg className="w-6 h-6 animate-spin text-acid" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
         </svg>
       </div>
@@ -130,7 +137,13 @@ function FileCard({
               hover:text-red-400 hover:border-red-500/40 transition-all"
             title="Remove"
           >
-            <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg
+              className="w-2.5 h-2.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -139,7 +152,10 @@ function FileCard({
 
       {/* Info */}
       <div className="p-2 space-y-1">
-        <p className="text-xs font-mono text-obsidian-200 truncate leading-tight" title={entry.name}>
+        <p
+          className="text-xs font-mono text-obsidian-200 truncate leading-tight"
+          title={entry.name}
+        >
           {entry.name}
         </p>
         <div className="flex items-center gap-1 text-xs font-mono text-obsidian-500">
@@ -151,13 +167,25 @@ function FileCard({
 
         {isDone && entry.result && (
           <div className="flex items-center justify-between pt-0.5">
-            <span className="text-[10px] font-mono text-acid">{formatBytes(entry.result.sizeBytes)}</span>
+            <span className="text-[10px] font-mono text-acid">
+              {formatBytes(entry.result.sizeBytes)}
+            </span>
             <button
               onClick={() => onDownload(entry.id)}
               className="text-[10px] font-mono text-obsidian-400 hover:text-acid transition-colors flex items-center gap-0.5"
             >
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              <svg
+                className="w-3 h-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
               </svg>
               .{targetFormat}
             </button>
@@ -195,7 +223,10 @@ function DropZone({ onFiles }: { onFiles: (files: File[]) => void }): React.Reac
 
   return (
     <div
-      onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+      onDragOver={(e) => {
+        e.preventDefault()
+        setDragging(true)
+      }}
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
@@ -207,14 +238,22 @@ function DropZone({ onFiles }: { onFiles: (files: File[]) => void }): React.Reac
     >
       <svg
         className={`w-8 h-8 ${dragging ? 'text-acid' : 'text-obsidian-600'}`}
-        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={1.5}
       >
-        <path strokeLinecap="round" strokeLinejoin="round"
-          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+        />
       </svg>
       <div className="text-center">
         <p className="text-sm font-mono text-obsidian-300">Drop images or click to browse</p>
-        <p className="text-xs font-mono text-obsidian-500 mt-0.5">PNG · JPEG · WebP — any number of files</p>
+        <p className="text-xs font-mono text-obsidian-500 mt-0.5">
+          PNG · JPEG · WebP — any number of files
+        </p>
       </div>
       <input
         ref={inputRef}
@@ -297,9 +336,11 @@ function ConvertSidebar({
                 className={`
                   w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-left
                   transition-all disabled:opacity-50
-                  ${isActive
-                    ? 'border-acid/50 bg-acid/5 text-obsidian-100'
-                    : 'border-obsidian-700 bg-obsidian-800/40 text-obsidian-400 hover:border-obsidian-500 hover:text-obsidian-200'}
+                  ${
+                    isActive
+                      ? 'border-acid/50 bg-acid/5 text-obsidian-100'
+                      : 'border-obsidian-700 bg-obsidian-800/40 text-obsidian-400 hover:border-obsidian-500 hover:text-obsidian-200'
+                  }
                 `}
               >
                 <div className="flex items-center gap-2">
@@ -320,12 +361,16 @@ function ConvertSidebar({
         {selectedMeta.lossy && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-obsidian-400 uppercase tracking-widest">Quality</span>
+              <span className="text-xs font-mono text-obsidian-400 uppercase tracking-widest">
+                Quality
+              </span>
               <span className="text-xs font-mono text-acid">{Math.round(quality * 100)}%</span>
             </div>
             <input
               type="range"
-              min={0.1} max={1} step={0.01}
+              min={0.1}
+              max={1}
+              step={0.01}
               value={quality}
               disabled={converting}
               onChange={(e) => onQualityChange(parseFloat(e.target.value))}
@@ -343,9 +388,13 @@ function ConvertSidebar({
           <div className="rounded-lg border border-obsidian-800 bg-obsidian-900/50 p-3 space-y-1.5">
             {[
               { label: 'Total files', value: total, color: 'text-obsidian-200' },
-              { label: 'Converted',   value: doneCount, color: 'text-acid' },
-              { label: 'Pending',     value: pendingCount, color: 'text-obsidian-400' },
-              { label: 'Errors',      value: entries.filter((e) => e.status === 'error').length, color: 'text-red-400' },
+              { label: 'Converted', value: doneCount, color: 'text-acid' },
+              { label: 'Pending', value: pendingCount, color: 'text-obsidian-400' },
+              {
+                label: 'Errors',
+                value: entries.filter((e) => e.status === 'error').length,
+                color: 'text-red-400',
+              },
             ].map(({ label, value, color }) => (
               <div key={label} className="flex justify-between text-xs font-mono">
                 <span className="text-obsidian-500">{label}</span>
@@ -381,7 +430,13 @@ function ConvertSidebar({
                 border border-obsidian-700 bg-obsidian-800/40 text-obsidian-300 font-mono text-xs
                 hover:border-obsidian-500 hover:text-obsidian-100 transition-all"
             >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
               Add more files
@@ -408,15 +463,32 @@ function ConvertSidebar({
             {converting ? (
               <>
                 <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                 </svg>
                 Converting…
               </>
             ) : (
               <>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                  />
                 </svg>
                 Convert {pendingCount > 1 ? `${pendingCount} Files` : 'File'}
               </>
@@ -431,8 +503,18 @@ function ConvertSidebar({
               border border-acid/40 bg-acid/10 text-acid
               hover:bg-acid/20 active:scale-[0.98] transition-all"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
             </svg>
             {doneCount === 1 ? `Download .${targetFormat}` : `Download ZIP (${doneCount})`}
           </button>
@@ -554,12 +636,18 @@ export function ConvertLayout(): React.ReactElement {
   }, [])
 
   const handleFormatChange = useCallback(
-    (f: ExportFormat) => { setTargetFormat(f); resetDoneEntries() },
+    (f: ExportFormat) => {
+      setTargetFormat(f)
+      resetDoneEntries()
+    },
     [resetDoneEntries]
   )
 
   const handleQualityChange = useCallback(
-    (q: number) => { setQuality(q); resetDoneEntries() },
+    (q: number) => {
+      setQuality(q)
+      resetDoneEntries()
+    },
     [resetDoneEntries]
   )
 
