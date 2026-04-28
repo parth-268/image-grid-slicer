@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-obsidian-950 text-obsidian-100;
+    font-family: 'DM Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  #root {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.obsidian.700');
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.obsidian.500');
+  }
+
+  /* Range input accent */
+  input[type="range"] {
+    accent-color: #c6f135;
+  }
+}
+
+@layer utilities {
+  .font-mono {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  .font-display {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .font-body {
+    font-family: 'DM Sans', sans-serif;
+  }
+}
