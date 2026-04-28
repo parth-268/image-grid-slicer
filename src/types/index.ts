@@ -62,7 +62,7 @@ export interface Slice {
 
 // ─── Mode & Export Types ─────────────────────────────────────────────────────
 
-export type SliceMode = 'grid' | 'custom'
+export type SliceMode = 'grid' | 'custom' | 'convert'
 export type ExportFormat = 'png' | 'jpeg' | 'webp'
 export type ExportType = 'zip' | 'individual' | 'spritesheet'
 
