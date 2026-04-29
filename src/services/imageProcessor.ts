@@ -35,7 +35,7 @@ async function canvasToBlob(
   }
 
   return new Promise<Blob>((resolve, reject) => {
-    ;(canvas as HTMLCanvasElement).toBlob(
+    (canvas as HTMLCanvasElement).toBlob(
       (blob) => {
         if (blob) resolve(blob)
         else reject(new Error('Failed to convert canvas to blob'))
@@ -68,6 +68,22 @@ async function processCell(
   return canvasToBlob(canvas, options.format, options.quality)
 }
 
+function sourceRectFromRegion(
+  region: CustomRegion,
+  imgW: number,
+  imgH: number
+): { sx: number; sy: number; sw: number; sh: number } | null {
+  const x1 = Math.max(0, Math.min(imgW, Math.floor(region.x * imgW)))
+  const y1 = Math.max(0, Math.min(imgH, Math.floor(region.y * imgH)))
+  const x2 = Math.max(0, Math.min(imgW, Math.ceil((region.x + region.width) * imgW)))
+  const y2 = Math.max(0, Math.min(imgH, Math.ceil((region.y + region.height) * imgH)))
+  const sw = x2 - x1
+  const sh = y2 - y1
+
+  if (sw <= 0 || sh <= 0) return null
+  return { sx: x1, sy: y1, sw, sh }
+}
+
 // ─── Grid Slicing ────────────────────────────────────────────────────────────
 
 export async function sliceImageGrid(
@@ -79,30 +95,33 @@ export async function sliceImageGrid(
   const bitmap = await loadImageBitmap(imageFile)
   const slices: Slice[] = []
 
-  for (let i = 0; i < cells.length; i++) {
-    const cell = cells[i]
+  try {
+    for (let i = 0; i < cells.length; i++) {
+      const cell = cells[i]
 
-    const blob = await processCell(bitmap, cell.x, cell.y, cell.width, cell.height, options)
+      const blob = await processCell(bitmap, cell.x, cell.y, cell.width, cell.height, options)
 
-    const url = URL.createObjectURL(blob)
-    const label = `${options.prefix}_r${String(cell.row + 1).padStart(2, '0')}_c${String(cell.col + 1).padStart(2, '0')}`
+      const url = URL.createObjectURL(blob)
+      const label = `${options.prefix}_r${String(cell.row + 1).padStart(2, '0')}_c${String(cell.col + 1).padStart(2, '0')}`
 
-    slices.push({
-      id: crypto.randomUUID(),
-      label,
-      blob,
-      url,
-      width: cell.width,
-      height: cell.height,
-      sizeBytes: blob.size,
-      row: cell.row,
-      col: cell.col,
-    })
+      slices.push({
+        id: crypto.randomUUID(),
+        label,
+        blob,
+        url,
+        width: cell.width,
+        height: cell.height,
+        sizeBytes: blob.size,
+        row: cell.row,
+        col: cell.col,
+      })
 
-    onProgress?.(Math.round(((i + 1) / cells.length) * 100))
+      onProgress?.(Math.round(((i + 1) / cells.length) * 100))
+    }
+  } finally {
+    bitmap.close()
   }
 
-  bitmap.close()
   return slices
 }
 
@@ -118,35 +137,32 @@ export async function sliceImageCustom(
   const slices: Slice[] = []
   const { width: imgW, height: imgH } = imageFile
 
-  for (let i = 0; i < regions.length; i++) {
-    const region = regions[i]
+  try {
+    for (let i = 0; i < regions.length; i++) {
+      const region = regions[i]
+      const sourceRect = sourceRectFromRegion(region, imgW, imgH)
+      if (!sourceRect) continue
 
-    // Convert normalized coordinates to pixel coordinates
-    const sx = Math.round(region.x * imgW)
-    const sy = Math.round(region.y * imgH)
-    const sw = Math.round(region.width * imgW)
-    const sh = Math.round(region.height * imgH)
+      const { sx, sy, sw, sh } = sourceRect
+      const blob = await processCell(bitmap, sx, sy, sw, sh, options)
+      const url = URL.createObjectURL(blob)
 
-    // Guard against zero-size regions
-    if (sw <= 0 || sh <= 0) continue
+      slices.push({
+        id: crypto.randomUUID(),
+        label: region.label || `${options.prefix}_${i + 1}`,
+        blob,
+        url,
+        width: sw,
+        height: sh,
+        sizeBytes: blob.size,
+      })
 
-    const blob = await processCell(bitmap, sx, sy, sw, sh, options)
-    const url = URL.createObjectURL(blob)
-
-    slices.push({
-      id: crypto.randomUUID(),
-      label: region.label || `${options.prefix}_${i + 1}`,
-      blob,
-      url,
-      width: sw,
-      height: sh,
-      sizeBytes: blob.size,
-    })
-
-    onProgress?.(Math.round(((i + 1) / regions.length) * 100))
+      onProgress?.(Math.round(((i + 1) / regions.length) * 100))
+    }
+  } finally {
+    bitmap.close()
   }
 
-  bitmap.close()
   return slices
 }
 
@@ -161,14 +177,17 @@ export async function convertFile(
     premultiplyAlpha: 'none',
     colorSpaceConversion: 'none',
   })
-  const canvas = createOffscreenCanvas(bitmap.width, bitmap.height)
-  const ctx = canvas.getContext('2d') as
-    | CanvasRenderingContext2D
-    | OffscreenCanvasRenderingContext2D
-  if (!ctx) throw new Error('Failed to get canvas context')
-  ctx.drawImage(bitmap, 0, 0)
-  bitmap.close()
-  return canvasToBlob(canvas, targetFormat, quality)
+  try {
+    const canvas = createOffscreenCanvas(bitmap.width, bitmap.height)
+    const ctx = canvas.getContext('2d') as
+      | CanvasRenderingContext2D
+      | OffscreenCanvasRenderingContext2D
+    if (!ctx) throw new Error('Failed to get canvas context')
+    ctx.drawImage(bitmap, 0, 0)
+    return canvasToBlob(canvas, targetFormat, quality)
+  } finally {
+    bitmap.close()
+  }
 }
 
 // ─── Format Conversion (ImageFile) ───────────────────────────────────────────
@@ -179,14 +198,17 @@ export async function convertImageFormat(
   quality: number
 ): Promise<Blob> {
   const bitmap = await loadImageBitmap(imageFile)
-  const canvas = createOffscreenCanvas(imageFile.width, imageFile.height)
-  const ctx = canvas.getContext('2d') as
-    | CanvasRenderingContext2D
-    | OffscreenCanvasRenderingContext2D
-  if (!ctx) throw new Error('Failed to get canvas context')
-  ctx.drawImage(bitmap, 0, 0)
-  bitmap.close()
-  return canvasToBlob(canvas, targetFormat, quality)
+  try {
+    const canvas = createOffscreenCanvas(imageFile.width, imageFile.height)
+    const ctx = canvas.getContext('2d') as
+      | CanvasRenderingContext2D
+      | OffscreenCanvasRenderingContext2D
+    if (!ctx) throw new Error('Failed to get canvas context')
+    ctx.drawImage(bitmap, 0, 0)
+    return canvasToBlob(canvas, targetFormat, quality)
+  } finally {
+    bitmap.close()
+  }
 }
 
 // ─── Sprite Sheet Generator ───────────────────────────────────────────────────

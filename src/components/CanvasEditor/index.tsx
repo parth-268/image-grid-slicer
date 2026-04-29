@@ -99,7 +99,10 @@ export function CanvasEditor(): React.ReactElement | null {
     const ro = new ResizeObserver((entries) => {
       const entry = entries[0]
       if (!entry || !overlayRef.current) return
-      const { width, height } = entry.contentRect
+      const target = entry.target
+      if (!(target instanceof HTMLElement)) return
+      const { width, height } = target.getBoundingClientRect()
+      if (width <= 0 || height <= 0) return
       overlayRef.current.width = width
       overlayRef.current.height = height
       redraw()

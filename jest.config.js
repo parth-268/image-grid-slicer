@@ -2,7 +2,7 @@
 export default {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  setupFilesAfterFramework: [],
+  setupFilesAfterEnv: [],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },

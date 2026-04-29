@@ -1,8 +1,8 @@
-# GridSlicer — Image Grid Slicer Application
+# Grid-vertcorner — Image Slicing Application
 
 A production-grade, enterprise-ready image slicing tool. Upload an image, divide it into grid-based or custom rectangular regions, preview all slices, and export as ZIP, individual files, or a combined sprite sheet.
 
-![GridSlicer Preview](https://via.placeholder.com/800x400/18181c/c6f135?text=GridSlicer)
+![Grid-vertcorner Preview](https://via.placeholder.com/800x400/18181c/c6f135?text=Grid-vertcorner)
 
 ---
 
@@ -17,8 +17,8 @@ A production-grade, enterprise-ready image slicing tool. Upload an image, divide
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-org/image-grid-slicer
-cd image-grid-slicer
+git clone https://github.com/your-org/grid-vertcorner
+cd grid-vertcorner
 
 # Install dependencies
 npm install

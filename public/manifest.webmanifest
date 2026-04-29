@@ -1,0 +1,14 @@
+{
+  "name": "Grid-vertcorner — Browser Utility Tools",
+  "short_name": "Grid-vertcorner",
+  "description": "Slice, crop, and convert images entirely in your browser.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0b0f",
+  "theme_color": "#0a0b0f",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ]
+}

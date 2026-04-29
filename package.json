@@ -1,7 +1,7 @@
 {
-  "name": "image-grid-slicer",
+  "name": "grid-vertcorner",
   "version": "1.0.0",
-  "description": "Production-grade Image Grid Slicer Application",
+  "description": "Grid-vertcorner browser image slicing and conversion application",
   "type": "module",
   "scripts": {
     "dev": "vite",

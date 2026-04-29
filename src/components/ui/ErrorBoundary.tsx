@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { APP_NAME } from '@/core/branding'
 
 interface Props {
   children: React.ReactNode
@@ -21,7 +22,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    console.error('[GridSlicer] Uncaught error:', error, errorInfo)
+    console.error(`[${APP_NAME}] Uncaught error:`, error, errorInfo)
   }
 
   render(): React.ReactNode {

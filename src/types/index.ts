@@ -37,6 +37,22 @@ export interface CustomRegion {
   y: number // 0–1 normalized
   width: number // 0–1 normalized
   height: number // 0–1 normalized
+  /** Stacking order. Higher = drawn on top + selected first under cursor. */
+  zIndex?: number
+  /** Lock prevents move/resize/delete via canvas interaction. */
+  locked?: boolean
+  /** Optional accent color (CSS string). Falls back to theme palette when absent. */
+  color?: string
+}
+
+export interface Viewport {
+  zoom: number // 1 = fit
+  panX: number // CSS-px offset relative to image-fit
+  panY: number
+  showGrid: boolean
+  snapToGrid: boolean
+  gridSize: number // image-space px between grid lines
+  showOverlap: boolean
 }
 
 export type DrawState = 'idle' | 'drawing' | 'resizing' | 'moving'

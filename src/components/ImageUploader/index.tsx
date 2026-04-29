@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { useImageLoader } from '@/hooks/useImageLoader'
 import { useSlicerStore } from '@/store/slicerStore'
+import { APP_INITIALS, APP_NAME, APP_TAGLINE } from '@/core/branding'
 
 export function ImageUploader(): React.ReactElement {
   const { loadImage } = useImageLoader()
@@ -26,19 +27,19 @@ export function ImageUploader(): React.ReactElement {
   )
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-obsidian-950 p-8">
+    <div className="flex flex-col items-center justify-center min-h-[100dvh] bg-obsidian-950 p-4 sm:p-8 safe-area-x safe-area-top safe-area-bottom">
       {/* Wordmark */}
-      <div className="text-center mb-10 animate-fade-in">
+      <div className="text-center mb-6 sm:mb-10 animate-fade-in">
         <div className="flex items-center justify-center gap-3 mb-3">
           <div className="w-8 h-8 bg-acid rounded flex items-center justify-center">
-            <GridIcon />
+            <span className="text-obsidian-950 text-xs font-bold">{APP_INITIALS}</span>
           </div>
           <span className="font-display text-2xl font-bold text-obsidian-100 tracking-tight">
-            Grid<span className="text-acid">Slicer</span>
+            {APP_NAME}
           </span>
         </div>
         <p className="text-sm font-mono text-obsidian-500 tracking-wider">
-          Slice · Crop · Convert — all in-browser
+          {APP_TAGLINE}
         </p>
       </div>
 
@@ -175,16 +176,5 @@ export function ImageUploader(): React.ReactElement {
         JPG · PNG · WebP &nbsp;·&nbsp; All processing happens in your browser
       </p>
     </div>
-  )
-}
-
-function GridIcon(): React.ReactElement {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <rect x="1" y="1" width="6" height="6" rx="1" fill="#18181c" />
-      <rect x="9" y="1" width="6" height="6" rx="1" fill="#18181c" />
-      <rect x="1" y="9" width="6" height="6" rx="1" fill="#18181c" />
-      <rect x="9" y="9" width="6" height="6" rx="1" fill="#18181c" />
-    </svg>
   )
 }

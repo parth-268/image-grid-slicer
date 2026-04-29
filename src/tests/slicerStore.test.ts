@@ -83,6 +83,121 @@ describe('useSlicerStore', () => {
     })
   })
 
+  describe('z-index ordering', () => {
+    test('addRegion auto-assigns increasing zIndex', () => {
+      act(() => {
+        useSlicerStore.getState().addRegion({
+          id: '1', label: 'R1', x: 0, y: 0, width: 0.3, height: 0.3,
+        })
+        useSlicerStore.getState().addRegion({
+          id: '2', label: 'R2', x: 0.1, y: 0.1, width: 0.3, height: 0.3,
+        })
+      })
+      const [a, b] = useSlicerStore.getState().regions
+      expect((a.zIndex ?? 0) < (b.zIndex ?? 0)).toBe(true)
+    })
+
+    test('bringToFront raises zIndex above all others', () => {
+      act(() => {
+        useSlicerStore.getState().addRegion({
+          id: '1', label: 'R1', x: 0, y: 0, width: 0.3, height: 0.3,
+        })
+        useSlicerStore.getState().addRegion({
+          id: '2', label: 'R2', x: 0.1, y: 0.1, width: 0.3, height: 0.3,
+        })
+        useSlicerStore.getState().bringToFront('1')
+      })
+      const regions = useSlicerStore.getState().regions
+      const r1 = regions.find((r) => r.id === '1')!
+      const r2 = regions.find((r) => r.id === '2')!
+      expect((r1.zIndex ?? 0)).toBeGreaterThan(r2.zIndex ?? 0)
+    })
+
+    test('sendToBack lowers zIndex below all others', () => {
+      act(() => {
+        useSlicerStore.getState().addRegion({
+          id: '1', label: 'R1', x: 0, y: 0, width: 0.3, height: 0.3,
+        })
+        useSlicerStore.getState().addRegion({
+          id: '2', label: 'R2', x: 0.1, y: 0.1, width: 0.3, height: 0.3,
+        })
+        useSlicerStore.getState().sendToBack('2')
+      })
+      const regions = useSlicerStore.getState().regions
+      const r1 = regions.find((r) => r.id === '1')!
+      const r2 = regions.find((r) => r.id === '2')!
+      expect((r2.zIndex ?? 0)).toBeLessThan(r1.zIndex ?? 0)
+    })
+  })
+
+  describe('replaceRegions', () => {
+    test('replaces regions atomically and assigns zIndex when missing', () => {
+      act(() => {
+        useSlicerStore.getState().replaceRegions([
+          { id: 'a', label: 'A', x: 0, y: 0, width: 0.5, height: 0.5 },
+          { id: 'b', label: 'B', x: 0, y: 0.5, width: 0.5, height: 0.5 },
+        ])
+      })
+      const regions = useSlicerStore.getState().regions
+      expect(regions).toHaveLength(2)
+      expect(regions.every((r) => typeof r.zIndex === 'number')).toBe(true)
+    })
+  })
+
+  describe('history', () => {
+    test('undo restores previous regions snapshot', () => {
+      act(() => {
+        useSlicerStore.getState().addRegion({
+          id: '1', label: 'R1', x: 0, y: 0, width: 0.3, height: 0.3,
+        })
+        useSlicerStore.getState().addRegion({
+          id: '2', label: 'R2', x: 0.4, y: 0.4, width: 0.3, height: 0.3,
+        })
+        useSlicerStore.getState().undo()
+      })
+      expect(useSlicerStore.getState().regions).toHaveLength(1)
+    })
+
+    test('redo restores after undo', () => {
+      act(() => {
+        useSlicerStore.getState().addRegion({
+          id: '1', label: 'R1', x: 0, y: 0, width: 0.3, height: 0.3,
+        })
+        useSlicerStore.getState().undo()
+        useSlicerStore.getState().redo()
+      })
+      expect(useSlicerStore.getState().regions).toHaveLength(1)
+    })
+  })
+
+  describe('viewport', () => {
+    test('default viewport has zoom 1, no pan, snap off', () => {
+      const { viewport } = useSlicerStore.getState()
+      expect(viewport.zoom).toBe(1)
+      expect(viewport.panX).toBe(0)
+      expect(viewport.panY).toBe(0)
+      expect(viewport.snapToGrid).toBe(false)
+    })
+
+    test('setViewport merges partial updates', () => {
+      act(() => useSlicerStore.getState().setViewport({ zoom: 2.5, showGrid: true }))
+      const { viewport } = useSlicerStore.getState()
+      expect(viewport.zoom).toBe(2.5)
+      expect(viewport.showGrid).toBe(true)
+      expect(viewport.panX).toBe(0)
+    })
+
+    test('resetViewport returns to defaults', () => {
+      act(() => {
+        useSlicerStore.getState().setViewport({ zoom: 4, panX: 100 })
+        useSlicerStore.getState().resetViewport()
+      })
+      const { viewport } = useSlicerStore.getState()
+      expect(viewport.zoom).toBe(1)
+      expect(viewport.panX).toBe(0)
+    })
+  })
+
   describe('reset', () => {
     test('reset returns to initial state', () => {
       act(() => {

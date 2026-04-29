@@ -10,7 +10,9 @@ import type {
   SliceMode,
   ExportOptions,
   ProcessingStatus,
+  Viewport,
 } from '@/types'
+import { APP_NAME } from '@/core/branding'
 
 const MAX_HISTORY = 50
 
@@ -42,6 +44,12 @@ interface CustomRegionState {
   removeRegion: (id: string) => void
   selectRegion: (id: string | null) => void
   clearRegions: () => void
+  /** Replace all regions atomically (used by project import). */
+  replaceRegions: (regions: CustomRegion[]) => void
+  /** Move a region to top of stacking order. */
+  bringToFront: (id: string) => void
+  /** Move a region to bottom of stacking order. */
+  sendToBack: (id: string) => void
   /** Call after a completed drag-move or drag-resize to record an undo checkpoint. */
   commitHistory: () => void
   undo: () => void
@@ -57,6 +65,12 @@ interface SliceState {
 interface ExportState {
   exportOptions: ExportOptions
   setExportOptions: (opts: Partial<ExportOptions>) => void
+}
+
+interface ViewportState {
+  viewport: Viewport
+  setViewport: (vp: Partial<Viewport>) => void
+  resetViewport: () => void
 }
 
 interface UIState {
@@ -79,6 +93,7 @@ type SlicerStore = ImageState &
   CustomRegionState &
   SliceState &
   ExportState &
+  ViewportState &
   UIState & {
     reset: () => void
     enterBulkConvert: () => void
@@ -100,6 +115,16 @@ const DEFAULT_EXPORT_OPTIONS: ExportOptions = {
   prefix: 'slice',
 }
 
+const DEFAULT_VIEWPORT: Viewport = {
+  zoom: 1,
+  panX: 0,
+  panY: 0,
+  showGrid: false,
+  snapToGrid: false,
+  gridSize: 32, // px in image space
+  showOverlap: true,
+}
+
 // ─── History Helpers ─────────────────────────────────────────────────────────
 
 function pushToHistory(
@@ -108,9 +133,19 @@ function pushToHistory(
   snapshot: CustomRegion[]
 ): { regionHistory: CustomRegion[][]; historyIndex: number } {
   const trimmed = history.slice(0, index + 1)
-  trimmed.push([...snapshot])
+  trimmed.push(snapshot.map((r) => ({ ...r })))
   const capped = trimmed.slice(-MAX_HISTORY)
   return { regionHistory: capped, historyIndex: capped.length - 1 }
+}
+
+function nextZIndex(regions: readonly CustomRegion[]): number {
+  if (regions.length === 0) return 1
+  let max = 0
+  for (const r of regions) {
+    const z = r.zIndex ?? 0
+    if (z > max) max = z
+  }
+  return max + 1
 }
 
 // ─── Store ───────────────────────────────────────────────────────────────────
@@ -120,8 +155,18 @@ export const useSlicerStore = create<SlicerStore>()(
     (set) => ({
       // ── Image ──────────────────────────────────────────────────────────────
       imageFile: null,
-      setImageFile: (file) => set({ imageFile: file }),
-      clearImage: () => set({ imageFile: null }),
+      setImageFile: (file) =>
+        set((state) => {
+          if (state.imageFile && state.imageFile.url !== file?.url) {
+            URL.revokeObjectURL(state.imageFile.url)
+          }
+          return { imageFile: file }
+        }),
+      clearImage: () =>
+        set((state) => {
+          if (state.imageFile) URL.revokeObjectURL(state.imageFile.url)
+          return { imageFile: null }
+        }),
 
       // ── Mode ───────────────────────────────────────────────────────────────
       mode: 'grid',
@@ -140,7 +185,11 @@ export const useSlicerStore = create<SlicerStore>()(
 
       addRegion: (region) =>
         set((state) => {
-          const newRegions = [...state.regions, region]
+          const withZ: CustomRegion = {
+            ...region,
+            zIndex: region.zIndex ?? nextZIndex(state.regions),
+          }
+          const newRegions = [...state.regions, withZ]
           return {
             regions: newRegions,
             ...pushToHistory(state.regionHistory, state.historyIndex, newRegions),
@@ -172,6 +221,48 @@ export const useSlicerStore = create<SlicerStore>()(
           historyIndex: 0,
         }),
 
+      replaceRegions: (regions) =>
+        set((state) => {
+          const normalized = regions.map((r, i) => ({
+            ...r,
+            zIndex: r.zIndex ?? i + 1,
+          }))
+          return {
+            regions: normalized,
+            selectedRegionId: null,
+            ...pushToHistory(state.regionHistory, state.historyIndex, normalized),
+          }
+        }),
+
+      bringToFront: (id) =>
+        set((state) => {
+          const top = nextZIndex(state.regions)
+          const newRegions = state.regions.map((r) =>
+            r.id === id ? { ...r, zIndex: top } : r
+          )
+          return {
+            regions: newRegions,
+            ...pushToHistory(state.regionHistory, state.historyIndex, newRegions),
+          }
+        }),
+
+      sendToBack: (id) =>
+        set((state) => {
+          let min = Infinity
+          for (const r of state.regions) {
+            const z = r.zIndex ?? 0
+            if (z < min) min = z
+          }
+          const bottom = min === Infinity ? 0 : min - 1
+          const newRegions = state.regions.map((r) =>
+            r.id === id ? { ...r, zIndex: bottom } : r
+          )
+          return {
+            regions: newRegions,
+            ...pushToHistory(state.regionHistory, state.historyIndex, newRegions),
+          }
+        }),
+
       commitHistory: () =>
         set((state) => ({
           ...pushToHistory(state.regionHistory, state.historyIndex, state.regions),
@@ -182,7 +273,7 @@ export const useSlicerStore = create<SlicerStore>()(
           if (state.historyIndex <= 0) return {}
           const newIndex = state.historyIndex - 1
           return {
-            regions: [...state.regionHistory[newIndex]],
+            regions: state.regionHistory[newIndex].map((r) => ({ ...r })),
             historyIndex: newIndex,
             selectedRegionId: null,
           }
@@ -193,7 +284,7 @@ export const useSlicerStore = create<SlicerStore>()(
           if (state.historyIndex >= state.regionHistory.length - 1) return {}
           const newIndex = state.historyIndex + 1
           return {
-            regions: [...state.regionHistory[newIndex]],
+            regions: state.regionHistory[newIndex].map((r) => ({ ...r })),
             historyIndex: newIndex,
             selectedRegionId: null,
           }
@@ -212,6 +303,11 @@ export const useSlicerStore = create<SlicerStore>()(
       exportOptions: DEFAULT_EXPORT_OPTIONS,
       setExportOptions: (opts) =>
         set((state) => ({ exportOptions: { ...state.exportOptions, ...opts } })),
+
+      // ── Viewport ───────────────────────────────────────────────────────────
+      viewport: DEFAULT_VIEWPORT,
+      setViewport: (vp) => set((state) => ({ viewport: { ...state.viewport, ...vp } })),
+      resetViewport: () => set({ viewport: DEFAULT_VIEWPORT }),
 
       // ── UI ─────────────────────────────────────────────────────────────────
       stage: 'upload',
@@ -242,6 +338,7 @@ export const useSlicerStore = create<SlicerStore>()(
             historyIndex: 0,
             slices: [],
             exportOptions: DEFAULT_EXPORT_OPTIONS,
+            viewport: DEFAULT_VIEWPORT,
             stage: 'upload',
             processingStatus: 'idle',
             processingProgress: 0,
@@ -249,6 +346,6 @@ export const useSlicerStore = create<SlicerStore>()(
           }
         }),
     }),
-    { name: 'GridSlicerStore' }
+    { name: `${APP_NAME}Store` }
   )
 )
