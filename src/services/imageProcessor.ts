@@ -225,23 +225,26 @@ export async function generateSpriteSheet(slices: Slice[], options: ExportOption
     )
   )
 
-  // Calculate sprite sheet dimensions (horizontal strip)
-  const totalWidth = slices.reduce((sum, s) => sum + s.width, 0)
-  const maxHeight = Math.max(...slices.map((s) => s.height))
+  try {
+    // Calculate sprite sheet dimensions (horizontal strip)
+    const totalWidth = slices.reduce((sum, s) => sum + s.width, 0)
+    const maxHeight = Math.max(...slices.map((s) => s.height))
 
-  const canvas = createOffscreenCanvas(totalWidth, maxHeight)
-  const ctx = canvas.getContext('2d') as
-    | CanvasRenderingContext2D
-    | OffscreenCanvasRenderingContext2D
+    const canvas = createOffscreenCanvas(totalWidth, maxHeight)
+    const ctx = canvas.getContext('2d') as
+      | CanvasRenderingContext2D
+      | OffscreenCanvasRenderingContext2D
 
-  if (!ctx) throw new Error('Failed to get canvas context')
+    if (!ctx) throw new Error('Failed to get canvas context')
 
-  let x = 0
-  for (let i = 0; i < bitmaps.length; i++) {
-    ctx.drawImage(bitmaps[i], x, 0)
-    x += slices[i].width
-    bitmaps[i].close()
+    let x = 0
+    for (let i = 0; i < bitmaps.length; i++) {
+      ctx.drawImage(bitmaps[i], x, 0)
+      x += slices[i].width
+    }
+
+    return canvasToBlob(canvas, options.format, options.quality)
+  } finally {
+    for (const bitmap of bitmaps) bitmap.close()
   }
-
-  return canvasToBlob(canvas, options.format, options.quality)
 }

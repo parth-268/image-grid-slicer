@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react'
 import { useSlicerStore } from '@/store/slicerStore'
-import { exportSlices } from '@/services/exportService'
 import { Button } from '@/components/ui/Button'
 import type { ExportType, ExportFormat } from '@/types'
 
@@ -33,6 +32,7 @@ export function ExportPanel(): React.ReactElement {
     setProgress(0)
 
     try {
+      const { exportSlices } = await import('@/services/exportService')
       await exportSlices(slices, exportOptions, setProgress)
       setDone(true)
       setTimeout(() => setDone(false), 3000)

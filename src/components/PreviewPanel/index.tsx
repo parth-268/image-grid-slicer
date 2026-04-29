@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { memo, useState, useCallback, useMemo } from 'react'
 import { useSlicerStore } from '@/store/slicerStore'
 import { formatBytes, formatDimensions } from '@/utils'
 import type { Slice } from '@/types'
@@ -7,15 +7,21 @@ interface SliceCardProps {
   slice: Slice
   index: number
   isSelected: boolean
-  onClick: () => void
+  onToggle: (id: string) => void
 }
 
-function SliceCard({ slice, index, isSelected, onClick }: SliceCardProps): React.ReactElement {
+const SliceCard = memo(function SliceCard({
+  slice,
+  index,
+  isSelected,
+  onToggle,
+}: SliceCardProps): React.ReactElement {
   const [loaded, setLoaded] = useState(false)
+  const handleClick = useCallback(() => onToggle(slice.id), [onToggle, slice.id])
 
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       className={`
         relative group rounded-lg overflow-hidden border transition-all duration-150 text-left
         ${
@@ -73,13 +79,16 @@ function SliceCard({ slice, index, isSelected, onClick }: SliceCardProps): React
       </div>
     </button>
   )
-}
+})
 
 export function PreviewPanel(): React.ReactElement {
   const { slices, imageFile } = useSlicerStore()
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
-  const totalSize = slices.reduce((sum, s) => sum + s.sizeBytes, 0)
+  const totalSize = useMemo(
+    () => slices.reduce((sum, s) => sum + s.sizeBytes, 0),
+    [slices]
+  )
 
   const toggleSlice = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -127,7 +136,7 @@ export function PreviewPanel(): React.ReactElement {
               slice={slice}
               index={idx}
               isSelected={selectedIds.has(slice.id)}
-              onClick={() => toggleSlice(slice.id)}
+              onToggle={toggleSlice}
             />
           ))}
         </div>
