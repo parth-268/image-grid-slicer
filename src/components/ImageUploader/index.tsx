@@ -2,6 +2,7 @@ import React, { useCallback, useRef, useState } from 'react'
 import { useImageLoader } from '@/hooks/useImageLoader'
 import { useSlicerStore } from '@/store/slicerStore'
 import { APP_INITIALS, APP_NAME, APP_TAGLINE } from '@/core/branding'
+import { navigate } from '@/core/router/hashRouter'
 
 export function ImageUploader(): React.ReactElement {
   const { loadImage } = useImageLoader()
@@ -16,6 +17,11 @@ export function ImageUploader(): React.ReactElement {
     },
     [loadImage]
   )
+
+  const handleBulkConvert = useCallback(() => {
+    navigate('/converter')
+    enterBulkConvert()
+  }, [enterBulkConvert])
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -122,7 +128,7 @@ export function ImageUploader(): React.ReactElement {
 
         {/* ── Path 2: Bulk convert ── */}
         <button
-          onClick={enterBulkConvert}
+          onClick={handleBulkConvert}
           className="relative rounded-2xl border-2 border-obsidian-700 bg-obsidian-900/50
             hover:border-acid/40 hover:bg-obsidian-900 cursor-pointer group transition-all duration-300
             text-left"
