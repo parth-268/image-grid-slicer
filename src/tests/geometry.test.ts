@@ -94,28 +94,19 @@ describe('geometry/contains + pointInRect', () => {
 describe('geometry/clampRect', () => {
   test('preserves size when fully inside', () => {
     expect(
-      clampRect(
-        { x: 2, y: 2, width: 3, height: 3 },
-        { x: 0, y: 0, width: 10, height: 10 }
-      )
+      clampRect({ x: 2, y: 2, width: 3, height: 3 }, { x: 0, y: 0, width: 10, height: 10 })
     ).toEqual({ x: 2, y: 2, width: 3, height: 3 })
   })
 
   test('shifts rect inside bounds when partly outside', () => {
     expect(
-      clampRect(
-        { x: 9, y: 9, width: 5, height: 5 },
-        { x: 0, y: 0, width: 10, height: 10 }
-      )
+      clampRect({ x: 9, y: 9, width: 5, height: 5 }, { x: 0, y: 0, width: 10, height: 10 })
     ).toEqual({ x: 5, y: 5, width: 5, height: 5 })
   })
 
   test('shrinks rect when larger than bounds', () => {
     expect(
-      clampRect(
-        { x: -5, y: -5, width: 20, height: 20 },
-        { x: 0, y: 0, width: 10, height: 10 }
-      )
+      clampRect({ x: -5, y: -5, width: 20, height: 20 }, { x: 0, y: 0, width: 10, height: 10 })
     ).toEqual({ x: 0, y: 0, width: 10, height: 10 })
   })
 })

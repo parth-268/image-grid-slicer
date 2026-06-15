@@ -87,10 +87,20 @@ describe('useSlicerStore', () => {
     test('addRegion auto-assigns increasing zIndex', () => {
       act(() => {
         useSlicerStore.getState().addRegion({
-          id: '1', label: 'R1', x: 0, y: 0, width: 0.3, height: 0.3,
+          id: '1',
+          label: 'R1',
+          x: 0,
+          y: 0,
+          width: 0.3,
+          height: 0.3,
         })
         useSlicerStore.getState().addRegion({
-          id: '2', label: 'R2', x: 0.1, y: 0.1, width: 0.3, height: 0.3,
+          id: '2',
+          label: 'R2',
+          x: 0.1,
+          y: 0.1,
+          width: 0.3,
+          height: 0.3,
         })
       })
       const [a, b] = useSlicerStore.getState().regions
@@ -100,33 +110,53 @@ describe('useSlicerStore', () => {
     test('bringToFront raises zIndex above all others', () => {
       act(() => {
         useSlicerStore.getState().addRegion({
-          id: '1', label: 'R1', x: 0, y: 0, width: 0.3, height: 0.3,
+          id: '1',
+          label: 'R1',
+          x: 0,
+          y: 0,
+          width: 0.3,
+          height: 0.3,
         })
         useSlicerStore.getState().addRegion({
-          id: '2', label: 'R2', x: 0.1, y: 0.1, width: 0.3, height: 0.3,
+          id: '2',
+          label: 'R2',
+          x: 0.1,
+          y: 0.1,
+          width: 0.3,
+          height: 0.3,
         })
         useSlicerStore.getState().bringToFront('1')
       })
       const regions = useSlicerStore.getState().regions
       const r1 = regions.find((r) => r.id === '1')!
       const r2 = regions.find((r) => r.id === '2')!
-      expect((r1.zIndex ?? 0)).toBeGreaterThan(r2.zIndex ?? 0)
+      expect(r1.zIndex ?? 0).toBeGreaterThan(r2.zIndex ?? 0)
     })
 
     test('sendToBack lowers zIndex below all others', () => {
       act(() => {
         useSlicerStore.getState().addRegion({
-          id: '1', label: 'R1', x: 0, y: 0, width: 0.3, height: 0.3,
+          id: '1',
+          label: 'R1',
+          x: 0,
+          y: 0,
+          width: 0.3,
+          height: 0.3,
         })
         useSlicerStore.getState().addRegion({
-          id: '2', label: 'R2', x: 0.1, y: 0.1, width: 0.3, height: 0.3,
+          id: '2',
+          label: 'R2',
+          x: 0.1,
+          y: 0.1,
+          width: 0.3,
+          height: 0.3,
         })
         useSlicerStore.getState().sendToBack('2')
       })
       const regions = useSlicerStore.getState().regions
       const r1 = regions.find((r) => r.id === '1')!
       const r2 = regions.find((r) => r.id === '2')!
-      expect((r2.zIndex ?? 0)).toBeLessThan(r1.zIndex ?? 0)
+      expect(r2.zIndex ?? 0).toBeLessThan(r1.zIndex ?? 0)
     })
   })
 
@@ -148,10 +178,20 @@ describe('useSlicerStore', () => {
     test('undo restores previous regions snapshot', () => {
       act(() => {
         useSlicerStore.getState().addRegion({
-          id: '1', label: 'R1', x: 0, y: 0, width: 0.3, height: 0.3,
+          id: '1',
+          label: 'R1',
+          x: 0,
+          y: 0,
+          width: 0.3,
+          height: 0.3,
         })
         useSlicerStore.getState().addRegion({
-          id: '2', label: 'R2', x: 0.4, y: 0.4, width: 0.3, height: 0.3,
+          id: '2',
+          label: 'R2',
+          x: 0.4,
+          y: 0.4,
+          width: 0.3,
+          height: 0.3,
         })
         useSlicerStore.getState().undo()
       })
@@ -161,7 +201,12 @@ describe('useSlicerStore', () => {
     test('redo restores after undo', () => {
       act(() => {
         useSlicerStore.getState().addRegion({
-          id: '1', label: 'R1', x: 0, y: 0, width: 0.3, height: 0.3,
+          id: '1',
+          label: 'R1',
+          x: 0,
+          y: 0,
+          width: 0.3,
+          height: 0.3,
         })
         useSlicerStore.getState().undo()
         useSlicerStore.getState().redo()

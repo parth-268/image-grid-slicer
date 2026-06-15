@@ -35,7 +35,7 @@ async function canvasToBlob(
   }
 
   return new Promise<Blob>((resolve, reject) => {
-    (canvas as HTMLCanvasElement).toBlob(
+    ;(canvas as HTMLCanvasElement).toBlob(
       (blob) => {
         if (blob) resolve(blob)
         else reject(new Error('Failed to convert canvas to blob'))

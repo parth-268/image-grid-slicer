@@ -237,9 +237,7 @@ export const useSlicerStore = create<SlicerStore>()(
       bringToFront: (id) =>
         set((state) => {
           const top = nextZIndex(state.regions)
-          const newRegions = state.regions.map((r) =>
-            r.id === id ? { ...r, zIndex: top } : r
-          )
+          const newRegions = state.regions.map((r) => (r.id === id ? { ...r, zIndex: top } : r))
           return {
             regions: newRegions,
             ...pushToHistory(state.regionHistory, state.historyIndex, newRegions),
@@ -254,9 +252,7 @@ export const useSlicerStore = create<SlicerStore>()(
             if (z < min) min = z
           }
           const bottom = min === Infinity ? 0 : min - 1
-          const newRegions = state.regions.map((r) =>
-            r.id === id ? { ...r, zIndex: bottom } : r
-          )
+          const newRegions = state.regions.map((r) => (r.id === id ? { ...r, zIndex: bottom } : r))
           return {
             regions: newRegions,
             ...pushToHistory(state.regionHistory, state.historyIndex, newRegions),

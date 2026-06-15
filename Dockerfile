@@ -22,14 +22,39 @@ RUN printf 'server {\n\
   server_name _;\n\
   root /usr/share/nginx/html;\n\
   index index.html;\n\
+\n\
   gzip on;\n\
-  gzip_types text/css application/javascript image/svg+xml;\n\
+  gzip_vary on;\n\
+  gzip_proxied any;\n\
+  gzip_comp_level 6;\n\
+  gzip_types\n\
+    text/plain text/css text/xml application/json\n\
+    application/javascript application/xml+rss\n\
+    image/svg+xml font/woff font/woff2;\n\
+\n\
+  add_header X-Content-Type-Options "nosniff" always;\n\
+  add_header X-Frame-Options "DENY" always;\n\
+  add_header Referrer-Policy "strict-origin-when-cross-origin" always;\n\
+  add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;\n\
+  add_header Content-Security-Policy "default-src '"'"'self'"'"'; script-src '"'"'self'"'"'; style-src '"'"'self'"'"' https://fonts.googleapis.com; font-src '"'"'self'"'"' https://fonts.gstatic.com; img-src '"'"'self'"'"' blob: data:; connect-src '"'"'self'"'"' blob:; object-src '"'"'none'"'"'; base-uri '"'"'self'"'"'; form-action '"'"'self'"'"'; frame-ancestors '"'"'none'"'"'" always;\n\
+\n\
   location / {\n\
     try_files $uri $uri/ /index.html;\n\
   }\n\
-  location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {\n\
+\n\
+  location /assets/ {\n\
     expires 1y;\n\
     add_header Cache-Control "public, immutable";\n\
+  }\n\
+\n\
+  location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {\n\
+    expires 1y;\n\
+    add_header Cache-Control "public, immutable";\n\
+  }\n\
+\n\
+  location = /manifest.webmanifest {\n\
+    expires 1d;\n\
+    add_header Cache-Control "public";\n\
   }\n\
 }\n' > /etc/nginx/conf.d/app.conf
 

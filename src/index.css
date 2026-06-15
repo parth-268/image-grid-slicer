@@ -13,16 +13,14 @@
   }
 
   body {
-    @apply bg-obsidian-950 text-obsidian-100;
+    @apply bg-obsidian-975 text-obsidian-100;
     font-family: 'DM Sans', sans-serif;
     margin: 0;
     padding: 0;
     overflow: hidden;
-    /* Use dynamic viewport unit on mobile to account for collapsing browser UI. */
     height: 100vh;
     height: 100dvh;
     overscroll-behavior: none;
-    /* Stop iOS/Android from auto-zooming into form fields. */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
@@ -34,12 +32,25 @@
     flex-direction: column;
   }
 
-  /* Prevent iOS double-tap zoom inside interactive controls. */
+  /* Global focus ring — consistent acid green across every focusable element */
+  :focus-visible {
+    outline: 2px solid theme('colors.acid.DEFAULT');
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Selection colour */
+  ::selection {
+    background-color: rgba(198, 241, 53, 0.18);
+    color: theme('colors.obsidian.50');
+  }
+
+  /* Prevent iOS double-tap zoom */
   button, [role="button"] {
     touch-action: manipulation;
   }
 
-  /* Avoid iOS auto-zoom on focus when font-size < 16px. */
+  /* Avoid iOS auto-zoom on focus when font-size < 16px */
   @supports (-webkit-touch-callout: none) {
     input, select, textarea {
       font-size: 16px;
@@ -47,16 +58,12 @@
   }
 
   /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  ::-webkit-scrollbar       { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb {
     background: theme('colors.obsidian.700');
     border-radius: 2px;
+    transition: background 0.2s;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: theme('colors.obsidian.500');
@@ -69,27 +76,49 @@
 }
 
 @layer utilities {
-  .font-mono {
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  }
+  .font-mono    { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-body    { font-family: 'DM Sans', sans-serif; }
 
-  .font-display {
-    font-family: 'Space Grotesk', sans-serif;
-  }
-
-  .font-body {
-    font-family: 'DM Sans', sans-serif;
-  }
-
-  /* iOS notch / Android nav-bar respect. */
-  .safe-area-top {
-    padding-top: env(safe-area-inset-top);
-  }
-  .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+  /* iOS safe areas */
+  .safe-area-top    { padding-top:    env(safe-area-inset-top); }
+  .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
   .safe-area-x {
-    padding-left: env(safe-area-inset-left);
+    padding-left:  env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
+  }
+
+  /* Shimmer skeleton */
+  .shimmer-bg {
+    background: linear-gradient(
+      90deg,
+      theme('colors.obsidian.900') 0%,
+      theme('colors.obsidian.800') 50%,
+      theme('colors.obsidian.900') 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s linear infinite;
+  }
+
+  /* Acid glow text utility */
+  .text-glow-acid {
+    text-shadow: 0 0 12px rgba(198, 241, 53, 0.4);
+  }
+
+  /* Subtle grid background */
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(198,241,53,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(198,241,53,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Smooth border gradient hover */
+  .border-acid-hover {
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .border-acid-hover:hover {
+    border-color: rgba(198, 241, 53, 0.35);
+    box-shadow: 0 0 20px rgba(198, 241, 53, 0.08);
   }
 }

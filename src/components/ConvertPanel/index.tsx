@@ -6,6 +6,8 @@ import { convertFile } from '@/services/imageProcessor'
 import { formatBytes } from '@/utils'
 import type { ExportFormat } from '@/types'
 
+const MAX_CONVERT_FILE_SIZE = 20 * 1024 * 1024 // 20 MB
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ConvertEntry {
@@ -133,9 +135,10 @@ function FileCard({
           <button
             onClick={() => onRemove(entry.id)}
             className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full bg-obsidian-950/80 border border-obsidian-700
-              flex items-center justify-center opacity-0 group-hover:opacity-100 text-obsidian-400
-              hover:text-red-400 hover:border-red-500/40 transition-all"
+              flex items-center justify-center opacity-0 group-hover:opacity-100 focus:opacity-100 text-obsidian-400
+              hover:text-red-400 hover:border-red-500/40 focus:text-red-400 focus:border-red-500/40 focus:outline-none transition-all"
             title="Remove"
+            aria-label={`Remove ${entry.name}`}
           >
             <svg
               className="w-2.5 h-2.5"
@@ -310,7 +313,7 @@ function ConvertSidebar({
   )
 
   return (
-    <aside className="w-72 flex-shrink-0 flex flex-col border-r border-obsidian-800 bg-obsidian-950/60">
+    <aside className="flex flex-col border-b md:border-b-0 md:border-r border-obsidian-800 bg-obsidian-950/60 w-full md:w-72 md:flex-shrink-0 max-h-[45vh] md:max-h-none">
       <div className="flex-1 overflow-y-auto p-5 space-y-6">
         <div>
           <div className="text-xs font-mono text-obsidian-400 uppercase tracking-widest mb-1">
@@ -584,13 +587,29 @@ function ConvertMain({
 // ─── ConvertLayout ────────────────────────────────────────────────────────────
 
 export function ConvertLayout(): React.ReactElement {
-  const { imageFile } = useSlicerStore()
+  const { imageFile, setError } = useSlicerStore()
   const [entries, setEntries] = useState<ConvertEntry[]>([])
   const [targetFormat, setTargetFormat] = useState<ExportFormat>('webp')
   const [quality, setQuality] = useState(0.92)
   const [converting, setConverting] = useState(false)
   const [progress, setProgress] = useState(0)
   const seededIdRef = useRef<string | null>(null)
+  const entriesRef = useRef<ConvertEntry[]>([])
+
+  // Keep ref in sync for unmount cleanup
+  useEffect(() => {
+    entriesRef.current = entries
+  }, [entries])
+
+  // Revoke all object URLs on unmount
+  useEffect(() => {
+    return () => {
+      entriesRef.current.forEach((e) => {
+        URL.revokeObjectURL(e.previewUrl)
+        if (e.result) URL.revokeObjectURL(e.result.url)
+      })
+    }
+  }, [])
 
   // Seed from the store's imageFile on mount / imageFile change
   useEffect(() => {
@@ -604,13 +623,26 @@ export function ConvertLayout(): React.ReactElement {
     }
   }, [imageFile])
 
-  const addFiles = useCallback((files: File[]) => {
-    setEntries((prev) => {
-      const existing = new Set(prev.map((e) => e.file.name + e.file.size))
-      const fresh = files.filter((f) => !existing.has(f.name + f.size)).map(fileToEntry)
-      return [...prev, ...fresh]
-    })
-  }, [])
+  const addFiles = useCallback(
+    (files: File[]) => {
+      const oversized = files.filter((f) => f.size > MAX_CONVERT_FILE_SIZE)
+      if (oversized.length > 0) {
+        setError({
+          code: 'FILE_TOO_LARGE',
+          message: `${oversized.length} file${oversized.length > 1 ? 's' : ''} exceeded the 20 MB limit and were skipped.`,
+        })
+      }
+      const valid = files.filter(
+        (f) => f.size <= MAX_CONVERT_FILE_SIZE && ACCEPTED_TYPES.includes(f.type)
+      )
+      setEntries((prev) => {
+        const existing = new Set(prev.map((e) => e.file.name + e.file.size))
+        const fresh = valid.filter((f) => !existing.has(f.name + f.size)).map(fileToEntry)
+        return [...prev, ...fresh]
+      })
+    },
+    [setError]
+  )
 
   const removeEntry = useCallback((id: string) => {
     setEntries((prev) => {
@@ -729,7 +761,7 @@ export function ConvertLayout(): React.ReactElement {
   }, [])
 
   return (
-    <div className="flex flex-1 overflow-hidden">
+    <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
       <ConvertSidebar
         entries={entries}
         targetFormat={targetFormat}
